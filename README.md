@@ -8,7 +8,7 @@
 
 <p>
   <a href="https://github.com/RenzoFernando/AudiVo/releases/latest">
-    <img src="https://img.shields.io/github/v/release/RenzoFernando/AudiVo?style=for-the-badge&label=VERSIÓN&color=3b82f6" alt="Última versión publicada">
+    <img src="https://img.shields.io/github/v/tag/RenzoFernando/AudiVo?sort=semver&style=for-the-badge&label=VERSI%C3%93N&color=3b82f6" alt="Versión actual">
   </a>
   <a href="https://github.com/RenzoFernando/AudiVo/releases/latest">
     <img src="https://img.shields.io/badge/VER%20RELEASES-20242b?style=for-the-badge" alt="Ver releases">
