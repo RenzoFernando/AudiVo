@@ -5,7 +5,7 @@ from datetime import datetime
 
 APP_NAME_INTERNAL = "AudiVo"
 APP_DISPLAY_NAME = "AudiVo"
-APP_VERSION = "1.7.0"
+APP_VERSION = "2.1.0"
 APP_AUTHOR = "Renzo Fernando Mosquera Daza"
 APP_VENDOR_NAME = "APPS_RenzoFernando"
 APP_COMPANY_NAME = APP_AUTHOR

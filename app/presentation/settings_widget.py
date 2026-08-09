@@ -1,10 +1,13 @@
 from __future__ import annotations
 
+from pathlib import Path
+
 from PySide6.QtCore import QPointF, Qt, Signal
-from PySide6.QtGui import QColor, QPainter, QPen
+from PySide6.QtGui import QColor, QPainter, QPalette, QPen
 from PySide6.QtWidgets import QComboBox, QFileDialog, QGridLayout, QHBoxLayout, QLabel, QLineEdit, QPushButton, QSizePolicy, QWidget
 
 from app.constants import ASPECT_RATIOS, BACKGROUNDS, QUALITIES, SUPPORTED_IMAGE_EXTENSIONS
+from app.infrastructure.system.app_paths import AppPaths
 from app.presentation.translations import tr
 
 
@@ -55,6 +58,7 @@ class SettingsWidget(QWidget):
         super().__init__(parent)
         self._ui_language = ui_language
         self._background_image = background_image
+        self._default_output_dir = str(AppPaths.videos_dir())
         layout = QGridLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setHorizontalSpacing(8)
@@ -75,7 +79,10 @@ class SettingsWidget(QWidget):
         self.image_button.setCursor(Qt.CursorShape.PointingHandCursor)
         self.image_button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.image_button.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Fixed)
-        self.output_edit = QLineEdit(output_dir)
+        self.output_edit = QLineEdit("" if self._is_default_output(output_dir) else output_dir)
+        output_palette = self.output_edit.palette()
+        output_palette.setColor(QPalette.ColorRole.PlaceholderText, QColor("#3b82f6"))
+        self.output_edit.setPalette(output_palette)
         self.output_button = CenteredDotsButton()
         self.output_button.setObjectName("browseButton")
         self.output_button.setFixedWidth(36)
@@ -101,7 +108,7 @@ class SettingsWidget(QWidget):
         self.quality_combo.currentIndexChanged.connect(self.preferences_changed.emit)
         self.background_combo.currentIndexChanged.connect(self._background_changed)
         self.image_button.clicked.connect(self._select_background_image)
-        self.output_edit.editingFinished.connect(self.preferences_changed.emit)
+        self.output_edit.editingFinished.connect(self._output_edited)
         self.output_button.clicked.connect(self._browse_output)
         self.set_ui_language(ui_language)
         self._refresh_image_button()
@@ -123,7 +130,7 @@ class SettingsWidget(QWidget):
         self._refresh_image_button()
 
     def output_dir(self) -> str:
-        return self.output_edit.text().strip()
+        return self.output_edit.text().strip() or self._default_output_dir
 
     def set_ui_language(self, ui_language: str) -> None:
         aspect_ratio = self.selected_aspect_ratio()
@@ -141,6 +148,7 @@ class SettingsWidget(QWidget):
         self.quality_label.setText(tr(ui_language, "quality"))
         self.background_label.setText(tr(ui_language, "background"))
         self.output_label.setText(tr(ui_language, "save_in"))
+        self.output_edit.setPlaceholderText(tr(ui_language, "default_output_path"))
         self.output_button.setToolTip(tr(ui_language, "select_output_folder"))
         self._refresh_image_button()
 
@@ -202,11 +210,25 @@ class SettingsWidget(QWidget):
         selected = QFileDialog.getExistingDirectory(
             self,
             tr(self._ui_language, "select_output_folder"),
-            self.output_edit.text(),
+            self.output_dir(),
         )
         if selected:
-            self.output_edit.setText(selected)
+            self.output_edit.setText("" if self._is_default_output(selected) else selected)
             self.preferences_changed.emit()
+
+    def _output_edited(self) -> None:
+        if self._is_default_output(self.output_edit.text()):
+            self.output_edit.clear()
+        self.preferences_changed.emit()
+
+    def _is_default_output(self, value: str) -> bool:
+        text = str(value or "").strip()
+        if not text:
+            return True
+        try:
+            return Path(text).expanduser().resolve() == Path(self._default_output_dir).expanduser().resolve()
+        except Exception:
+            return text == self._default_output_dir
 
     def _refresh_image_button(self) -> None:
         is_image = self.selected_background() == "Imagen"
@@ -222,3 +244,4 @@ class SettingsWidget(QWidget):
     def _select_data(self, combo: QComboBox, value: str) -> None:
         index = combo.findData(value)
         combo.setCurrentIndex(index if index >= 0 else 0)
+

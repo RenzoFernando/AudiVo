@@ -8,7 +8,7 @@ from PySide6.QtCore import QThread, QTimer, Qt, QUrl
 from PySide6.QtGui import QDesktopServices
 from PySide6.QtWidgets import QFileDialog, QFrame, QHBoxLayout, QLabel, QMainWindow, QMessageBox, QPushButton, QVBoxLayout, QWidget
 
-from app.app_meta import APP_VERSION
+from app.app_meta import APP_VERSION, APP_WEBSITE_URL
 from app.constants import APP_NAME, GITHUB_URL, RESOLUTIONS, SUPPORTED_AUDIO_EXTENSIONS, WINDOW_HEIGHT, WINDOW_WIDTH
 from app.domain.conversion_request import ConversionRequest
 from app.infrastructure.audio.audio_probe import AudioProbe
@@ -60,9 +60,13 @@ class MainWindow(QMainWindow):
         brand_row.setSpacing(8)
         brand_row.addWidget(self._accent_group(True))
         brand_row.addStretch(1)
-        brand = QLabel(f"{APP_NAME} v{APP_VERSION}")
+        brand = QLabel(f'<a href="{APP_WEBSITE_URL}" style="color:#3b82f6; text-decoration:none;">{APP_NAME} v{APP_VERSION}</a>')
         brand.setObjectName("brandLabel")
         brand.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        brand.setTextFormat(Qt.TextFormat.RichText)
+        brand.setTextInteractionFlags(Qt.TextInteractionFlag.LinksAccessibleByMouse)
+        brand.setOpenExternalLinks(True)
+        brand.setCursor(Qt.CursorShape.PointingHandCursor)
         brand_row.addWidget(brand, 0, Qt.AlignmentFlag.AlignCenter)
         brand_row.addStretch(1)
         brand_row.addWidget(self._accent_group(False))
@@ -231,8 +235,7 @@ class MainWindow(QMainWindow):
         self._apply_state()
 
     def _configured_output_dir(self) -> Path:
-        value = self.settings_widget.output_dir().strip()
-        return Path(value).expanduser() if value else AppPaths.videos_dir()
+        return Path(self.settings_widget.output_dir()).expanduser()
 
     def _start_conversion(self) -> None:
         if self._worker is not None or self._audio_path is None or self._audio_duration is None:
@@ -420,14 +423,16 @@ class MainWindow(QMainWindow):
             "aspect_ratio": self.settings_widget.selected_aspect_ratio(),
             "quality": self.settings_widget.selected_quality(),
             "background_mode": self.settings_widget.selected_background(),
-            "output_dir": self.settings_widget.output_dir() or str(AppPaths.videos_dir()),
+            "output_dir": self.settings_widget.output_dir(),
         })
         self._settings_repository.save(self._settings)
 
     def closeEvent(self, event) -> None:
         if self._worker is None:
+            self._save_settings()
             event.accept()
             return
         self._close_requested = True
         self._worker.request_cancel()
         event.ignore()
+
