@@ -17,7 +17,6 @@ class SettingsRepository:
             "aspect_ratio": DEFAULT_ASPECT_RATIO,
             "quality": DEFAULT_QUALITY,
             "background_mode": DEFAULT_BACKGROUND,
-            "background_image": "",
             "output_dir": str(AppPaths.videos_dir()),
         }
 

@@ -78,7 +78,7 @@ class MainWindow(QMainWindow):
             self._settings["aspect_ratio"],
             self._settings["quality"],
             self._settings["background_mode"],
-            self._settings["background_image"],
+            "",
             self._settings["output_dir"],
             self._ui_language,
         )
@@ -214,6 +214,7 @@ class MainWindow(QMainWindow):
             return
         self._audio_path = path
         self._audio_duration = duration
+        self.settings_widget.clear_background_image()
         self.current_audio_widget.set_audio(path, duration)
         self.current_audio_widget.set_state("selected")
         self.progress_widget.set_ready()
@@ -224,6 +225,7 @@ class MainWindow(QMainWindow):
             return
         self._audio_path = None
         self._audio_duration = None
+        self.settings_widget.clear_background_image()
         self.current_audio_widget.clear()
         self.progress_widget.set_waiting()
         self._apply_state()
@@ -418,7 +420,6 @@ class MainWindow(QMainWindow):
             "aspect_ratio": self.settings_widget.selected_aspect_ratio(),
             "quality": self.settings_widget.selected_quality(),
             "background_mode": self.settings_widget.selected_background(),
-            "background_image": self.settings_widget.background_image(),
             "output_dir": self.settings_widget.output_dir() or str(AppPaths.videos_dir()),
         })
         self._settings_repository.save(self._settings)
