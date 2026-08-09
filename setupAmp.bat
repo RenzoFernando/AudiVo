@@ -77,7 +77,8 @@ call :cleanup_pip_artifacts
 call :cleanup_crash_reports
 echo.
 echo Entorno listo.
-echo Ejecuta: .venv\Scripts\python.exe main.py
+echo Ejecuta buildportable.bat para el portable.
+echo Ejecuta buildinstaller.bat para el instalador.
 echo.
 pause
 exit /b 0

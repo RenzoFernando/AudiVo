@@ -18,8 +18,8 @@ class ChevronComboBox(QComboBox):
         pen.setCapStyle(Qt.PenCapStyle.RoundCap)
         painter.setPen(pen)
         drop_width = 27.0
-        center_x = self.width() - (drop_width / 2.0)
-        center_y = self.height() / 2.0
+        center_x = self.width() - ((drop_width + 1.0) / 2.0)
+        center_y = (self.height() - 1.0) / 2.0
         painter.drawLine(QPointF(center_x - 4.0, center_y - 2.0), QPointF(center_x, center_y + 2.0))
         painter.drawLine(QPointF(center_x, center_y + 2.0), QPointF(center_x + 4.0, center_y - 2.0))
 
@@ -33,8 +33,8 @@ class CenteredDotsButton(QPushButton):
         pen = QPen(color, 2.2)
         pen.setCapStyle(Qt.PenCapStyle.RoundCap)
         painter.setPen(pen)
-        center_x = self.width() / 2.0
-        center_y = self.height() / 2.0
+        center_x = (self.width() - 1.0) / 2.0
+        center_y = (self.height() - 1.0) / 2.0
         for offset in (-4.0, 0.0, 4.0):
             painter.drawPoint(QPointF(center_x + offset, center_y))
 
@@ -81,6 +81,15 @@ class SettingsWidget(QWidget):
         self.output_button.setFixedWidth(36)
         self.output_button.setCursor(Qt.CursorShape.PointingHandCursor)
         self.output_button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        for control in (
+            self.format_combo,
+            self.quality_combo,
+            self.background_combo,
+            self.image_button,
+            self.output_edit,
+            self.output_button,
+        ):
+            control.setFixedHeight(30)
         layout.addWidget(self.format_label, 0, 0)
         layout.addWidget(self.quality_label, 0, 1)
         layout.addWidget(self.format_combo, 1, 0)

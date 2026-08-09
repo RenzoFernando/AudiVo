@@ -18,8 +18,8 @@ class CenteredCloseButton(QPushButton):
         pen = QPen(color, 1.5)
         pen.setCapStyle(Qt.PenCapStyle.RoundCap)
         painter.setPen(pen)
-        center_x = self.width() / 2.0
-        center_y = self.height() / 2.0
+        center_x = (self.width() - 1.0) / 2.0
+        center_y = (self.height() - 1.0) / 2.0
         radius = 3.2
         painter.drawLine(QPointF(center_x - radius, center_y - radius), QPointF(center_x + radius, center_y + radius))
         painter.drawLine(QPointF(center_x + radius, center_y - radius), QPointF(center_x - radius, center_y + radius))

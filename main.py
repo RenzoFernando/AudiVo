@@ -35,7 +35,7 @@ def _ensure_dependencies() -> None:
 def main() -> int:
     _ensure_dependencies()
     from PySide6.QtCore import QEvent, QObject, QTimer, Qt
-    from PySide6.QtGui import QCursor
+    from PySide6.QtGui import QCursor, QIcon
     from PySide6.QtWidgets import QApplication, QDialog
     from app.app_meta import APP_COMPANY_NAME
     from app.constants import APP_NAME
@@ -80,6 +80,9 @@ def main() -> int:
     application.setOrganizationName(APP_COMPANY_NAME)
     application.setStyle("Fusion")
     AppPaths.cleanup_temp()
+    icon_path = AppPaths.app_icon_path()
+    if icon_path.exists():
+        application.setWindowIcon(QIcon(str(icon_path)))
     window = MainWindow()
     center_window(window)
     window.show()

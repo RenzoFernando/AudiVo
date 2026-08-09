@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import math
+import time
 from pathlib import Path
 
 from PySide6.QtCore import QThread, QTimer, Qt, QUrl
@@ -31,6 +33,8 @@ class MainWindow(QMainWindow):
         self._audio_path: Path | None = None
         self._audio_duration: float | None = None
         self._last_output_path: Path | None = None
+        self._conversion_started_at: float | None = None
+        self._eta_seconds: float | None = None
         self._worker: ConversionWorker | None = None
         self._thread: QThread | None = None
         self._close_requested = False
@@ -172,6 +176,7 @@ class MainWindow(QMainWindow):
         self.open_folder_button.setText(tr(self._ui_language, "open_folder"))
         self.language_toggle_button.setText(tr(self._ui_language, "app_language_code"))
         self.language_toggle_button.setToolTip(tr(self._ui_language, "switch_language_tooltip"))
+        self.github_button.setToolTip(tr(self._ui_language, "github_tooltip"))
         self.footer_label.setText("Copyright © 2026 ·")
         self.author_label.setText("· Renzo Fernando Mosquera Daza")
         if self._worker is None:
@@ -180,7 +185,8 @@ class MainWindow(QMainWindow):
             elif self._last_output_path is not None and self._last_output_path.exists() and self.progress_widget.progress.value() == 100:
                 self.progress_widget.set_completed()
             else:
-                self.progress_widget.set_processing(0, tr(self._ui_language, "ready"))
+                self.current_audio_widget.set_state("selected")
+                self.progress_widget.set_ready()
 
     def _browse_audio(self) -> None:
         patterns = " ".join(f"*{extension}" for extension in sorted(SUPPORTED_AUDIO_EXTENSIONS))
@@ -209,7 +215,8 @@ class MainWindow(QMainWindow):
         self._audio_path = path
         self._audio_duration = duration
         self.current_audio_widget.set_audio(path, duration)
-        self.progress_widget.set_processing(0, tr(self._ui_language, "ready"))
+        self.current_audio_widget.set_state("selected")
+        self.progress_widget.set_ready()
         self._apply_state()
 
     def _clear_audio(self) -> None:
@@ -271,7 +278,15 @@ class MainWindow(QMainWindow):
         thread.finished.connect(thread.deleteLater)
         self._thread = thread
         self._worker = worker
-        self.progress_widget.set_processing(0)
+        self._conversion_started_at = time.monotonic()
+        self._eta_seconds = None
+        detail = tr(
+            self._ui_language,
+            "processed_of_total_calculating",
+            processed=self._format_clock(0),
+            total=self._format_clock(self._audio_duration),
+        )
+        self.progress_widget.set_processing(0, detail)
         self._apply_state()
         self._save_settings()
         thread.start()
@@ -283,18 +298,47 @@ class MainWindow(QMainWindow):
         self._worker.request_cancel()
 
     def _on_progress(self, value: int) -> None:
-        self.progress_widget.set_processing(value)
+        value = max(0, min(100, int(value)))
+        duration = self._audio_duration
+        detail = ""
+        if duration and duration > 0:
+            processed = min(duration, duration * value / 100.0)
+            detail = tr(
+                self._ui_language,
+                "processed_of_total_calculating",
+                processed=self._format_clock(processed),
+                total=self._format_clock(duration),
+            )
+        if value >= 2 and value < 100 and self._conversion_started_at is not None:
+            elapsed = max(0.1, time.monotonic() - self._conversion_started_at)
+            raw_eta = elapsed * (100 - value) / value
+            if self._eta_seconds is None:
+                self._eta_seconds = raw_eta
+            else:
+                self._eta_seconds = self._eta_seconds * 0.72 + raw_eta * 0.28
+            if duration and duration > 0:
+                processed = min(duration, duration * value / 100.0)
+                detail = tr(
+                    self._ui_language,
+                    "processed_of_total_eta",
+                    processed=self._format_clock(processed),
+                    total=self._format_clock(duration),
+                    remaining=self._format_remaining(self._eta_seconds),
+                )
+        self.progress_widget.set_processing(value, detail)
 
     def _on_status(self, status: str) -> None:
-        text = tr(self._ui_language, status) if status == "processing" else status
-        self.progress_widget.set_processing(self.progress_widget.progress.value(), text)
+        if status == "processing":
+            self._on_progress(self.progress_widget.progress.value())
 
     def _on_completed(self, output_path: str) -> None:
         self._last_output_path = Path(output_path)
+        self.current_audio_widget.set_state("completed")
         self.progress_widget.set_completed()
 
     def _on_failed(self, message: str) -> None:
-        self.progress_widget.set_processing(0, tr(self._ui_language, "conversion_error"))
+        self.current_audio_widget.set_state("selected")
+        self.progress_widget.set_error()
         detail = message.strip()
         if detail:
             QMessageBox.critical(self, APP_NAME, f"{tr(self._ui_language, 'conversion_error')}\n\n{detail}")
@@ -302,6 +346,7 @@ class MainWindow(QMainWindow):
             QMessageBox.critical(self, APP_NAME, tr(self._ui_language, "conversion_error"))
 
     def _on_cancelled(self) -> None:
+        self.current_audio_widget.set_state("selected")
         self.progress_widget.set_cancelled()
 
     def _on_worker_finished(self) -> None:
@@ -345,6 +390,27 @@ class MainWindow(QMainWindow):
 
     def _open_github(self) -> None:
         QDesktopServices.openUrl(QUrl(GITHUB_URL))
+
+    def _format_remaining(self, seconds: float) -> str:
+        seconds = max(0.0, float(seconds))
+        if seconds < 60:
+            rounded = max(5, int(math.ceil(seconds / 5.0) * 5))
+            return f"{rounded} s"
+        minutes = math.ceil(seconds / 60)
+        if minutes < 60:
+            return f"{minutes} min"
+        hours, remaining_minutes = divmod(minutes, 60)
+        if remaining_minutes == 0:
+            return f"{hours} h"
+        return f"{hours} h {remaining_minutes} min"
+
+    def _format_clock(self, seconds: float) -> str:
+        total = max(0, int(seconds))
+        hours, remainder = divmod(total, 3600)
+        minutes, secs = divmod(remainder, 60)
+        if hours:
+            return f"{hours:02d}:{minutes:02d}:{secs:02d}"
+        return f"{minutes:02d}:{secs:02d}"
 
     def _save_settings(self) -> None:
         self._settings.update({

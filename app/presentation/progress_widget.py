@@ -50,14 +50,23 @@ class ProgressWidget(QFrame):
         self._start_waiting_animation()
         self._set_state("idle")
 
-    def set_processing(self, value: int = 0, status: str | None = None) -> None:
+    def set_ready(self) -> None:
+        self._stop_waiting_animation()
+        self.progress.setVisible(True)
+        self.progress.setRange(0, 100)
+        self.progress.setValue(0)
+        self.status_label.setText(tr(self._ui_language, "ready"))
+        self.detail_label.setText("")
+        self._set_state("idle")
+
+    def set_processing(self, value: int = 0, detail: str = "") -> None:
         self._stop_waiting_animation()
         normalized = max(0, min(100, int(value)))
         self.progress.setVisible(True)
         self.progress.setRange(0, 100)
         self.progress.setValue(normalized)
-        self.status_label.setText(status or tr(self._ui_language, "processing"))
-        self.detail_label.setText(f"{normalized}%")
+        self.status_label.setText(tr(self._ui_language, "status_creating_video", value=normalized))
+        self.detail_label.setText(detail)
         self._set_state("idle")
 
     def set_completed(self) -> None:
@@ -65,8 +74,8 @@ class ProgressWidget(QFrame):
         self.progress.setVisible(True)
         self.progress.setRange(0, 100)
         self.progress.setValue(100)
-        self.status_label.setText(tr(self._ui_language, "completed"))
-        self.detail_label.setText("100%")
+        self.status_label.setText(tr(self._ui_language, "status_completed_percent"))
+        self.detail_label.setText(tr(self._ui_language, "finished"))
         self._set_state("completed")
 
     def set_cancelled(self) -> None:
@@ -74,8 +83,17 @@ class ProgressWidget(QFrame):
         self.progress.setVisible(True)
         self.progress.setRange(0, 100)
         self.progress.setValue(0)
-        self.status_label.setText(tr(self._ui_language, "cancelled"))
-        self.detail_label.setText("0%")
+        self.status_label.setText(tr(self._ui_language, "status_cancelled"))
+        self.detail_label.setText(tr(self._ui_language, "partial_removed"))
+        self._set_state("idle")
+
+    def set_error(self) -> None:
+        self._stop_waiting_animation()
+        self.progress.setVisible(True)
+        self.progress.setRange(0, 100)
+        self.progress.setValue(0)
+        self.status_label.setText(tr(self._ui_language, "conversion_error_status"))
+        self.detail_label.setText("")
         self._set_state("idle")
 
     def _start_waiting_animation(self) -> None:

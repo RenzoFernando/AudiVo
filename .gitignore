@@ -1,0 +1,15 @@
+.venv/
+.idea/
+.vscode/
+__pycache__/
+*.py[cod]
+*.pyo
+*.spec
+build/
+dist/
+.build_*
+NuGetCrashReport*
+downloads/*
+!downloads/.gitkeep
+.DS_Store
+Thumbs.db

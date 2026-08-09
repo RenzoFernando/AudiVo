@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="AudiVo convierte audio en video MP4 localmente con FFmpeg.">
+    <meta name="theme-color" content="#0f1115">
+    <title>AudiVo · Audio a video local</title>
+    <link rel="icon" href="assets/icon.png">
+    <link rel="stylesheet" href="web/styles.css">
+</head>
+<body>
+    <header class="topbar">
+        <a class="brand" href="#inicio" aria-label="AudiVo, volver al inicio">
+            <img src="assets/icon.png" alt="">
+            <span>AudiVo</span>
+        </a>
+        <nav aria-label="Navegación principal">
+            <a href="#funciones">Funciones</a>
+            <a href="#descargar">Descargar</a>
+            <a href="https://github.com/RenzoFernando/AudiVo" target="_blank" rel="noreferrer">GitHub</a>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero" id="inicio">
+            <div class="hero-copy">
+                <div class="release-line">
+                    <span class="release-dot"></span>
+                    <span id="release-status">GitHub Releases</span>
+                    <span id="release-version"></span>
+                </div>
+                <h1>Del audio al video.<br><span>Sin salir de tu computador.</span></h1>
+                <p class="lead">Carga un audio, elige formato, calidad y fondo. AudiVo genera un MP4 localmente con FFmpeg.</p>
+                <div class="hero-actions">
+                    <a class="button primary release-download" id="hero-installer-link" href="https://github.com/RenzoFernando/AudiVo/releases/latest/download/AudiVo-Setup.exe">Descargar AudiVo</a>
+                    <a class="button secondary release-download" id="hero-portable-link" href="https://github.com/RenzoFernando/AudiVo/releases/latest/download/AudiVo-Portable.exe">Portable</a>
+                </div>
+                <div class="hero-links">
+                    <a href="https://github.com/RenzoFernando/AudiVo" target="_blank" rel="noreferrer">Repositorio de AudiVo</a>
+                    <span>·</span>
+                    <a href="https://github.com/RenzoFernando" target="_blank" rel="noreferrer">Git del creador</a>
+                </div>
+            </div>
+
+            <div class="app-preview" aria-label="Vista simplificada de AudiVo">
+                <div class="preview-title">
+                    <span></span>
+                    <strong>AudiVo</strong>
+                    <span></span>
+                </div>
+                <div class="preview-input">
+                    <strong>Arrastra un audio aquí</strong>
+                    <small>o selecciona un archivo desde tu computador</small>
+                    <div class="preview-input-actions">
+                        <b>Seleccionar audio</b>
+                    </div>
+                </div>
+                <div class="preview-current">
+                    <i></i>
+                    <div>
+                        <strong>Audio listo</strong>
+                        <small>Un archivo a la vez</small>
+                    </div>
+                </div>
+                <div class="preview-settings">
+                    <div><small>Formato</small><b>16:9 Horizontal</b></div>
+                    <div><small>Calidad</small><b>720p</b></div>
+                </div>
+                <div class="preview-settings">
+                    <div><small>Fondo</small><b>Negro</b></div>
+                    <div><small>Salida</small><b>Videos</b></div>
+                </div>
+                <div class="preview-progress"><span>Creando video</span><small>42%</small></div>
+                <div class="preview-bar"><span></span></div>
+                <div class="preview-main-action">CREAR VIDEO</div>
+                <div class="preview-bottom-actions"><span>Abrir video</span><span>Abrir carpeta</span><span>ES</span></div>
+            </div>
+        </section>
+
+        <section class="section" id="funciones">
+            <div class="section-heading">
+                <p class="eyebrow">LO ESENCIAL</p>
+                <h2>Una herramienta directa para crear video desde audio.</h2>
+            </div>
+            <div class="feature-grid">
+                <article>
+                    <span>01</span>
+                    <h3>Audio directo</h3>
+                    <p>Selecciona o arrastra un archivo compatible desde la misma interfaz.</p>
+                </article>
+                <article>
+                    <span>02</span>
+                    <h3>Formatos</h3>
+                    <p>Elige relaciones horizontales, verticales, cuadradas y ultrapanorámicas.</p>
+                </article>
+                <article>
+                    <span>03</span>
+                    <h3>Calidad</h3>
+                    <p>Genera videos en 480p, 720p o 1080p según lo que necesites.</p>
+                </article>
+                <article>
+                    <span>04</span>
+                    <h3>Fondos</h3>
+                    <p>Usa negro, blanco o una imagen personalizada sin deformarla.</p>
+                </article>
+                <article>
+                    <span>05</span>
+                    <h3>Progreso visible</h3>
+                    <p>Consulta porcentaje, audio procesado y tiempo restante aproximado.</p>
+                </article>
+                <article>
+                    <span>06</span>
+                    <h3>MP4 listo</h3>
+                    <p>Abre el video generado o su carpeta directamente desde AudiVo.</p>
+                </article>
+            </div>
+        </section>
+
+        <section class="local-section">
+            <p class="eyebrow">LOCAL POR DISEÑO</p>
+            <h2>Convierte con FFmpeg directamente en tu computador.</h2>
+            <p>AudiVo genera el video localmente y no depende de una API por minuto.</p>
+        </section>
+
+        <section class="download-section" id="descargar">
+            <div class="section-heading">
+                <p class="eyebrow">DESCARGAR</p>
+                <h2>Elige cómo quieres usar AudiVo.</h2>
+                <p id="download-status">Los botones apuntan siempre a los artefactos de la última release publicada.</p>
+            </div>
+            <div class="download-grid">
+                <article class="download-card recommended">
+                    <div class="download-head">
+                        <span>RECOMENDADO</span>
+                        <strong>Instalable</strong>
+                    </div>
+                    <p>Instala AudiVo, crea sus accesos y mantiene una integración más natural con el sistema.</p>
+                    <code>AudiVo-Setup.exe</code>
+                    <a class="button primary release-download" id="installer-download-link" href="https://github.com/RenzoFernando/AudiVo/releases/latest/download/AudiVo-Setup.exe">Descargar instalable</a>
+                </article>
+                <article class="download-card">
+                    <div class="download-head">
+                        <span>DIRECTO</span>
+                        <strong>Portable</strong>
+                    </div>
+                    <p>Ejecuta AudiVo directamente sin pasar por un proceso de instalación.</p>
+                    <code>AudiVo-Portable.exe</code>
+                    <a class="button secondary release-download" id="portable-download-link" href="https://github.com/RenzoFernando/AudiVo/releases/latest/download/AudiVo-Portable.exe">Descargar portable</a>
+                </article>
+            </div>
+            <div class="release-actions">
+                <a href="https://github.com/RenzoFernando/AudiVo/releases/latest" target="_blank" rel="noreferrer">Ver última release</a>
+                <a href="https://github.com/RenzoFernando/AudiVo" target="_blank" rel="noreferrer">Ver repositorio</a>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <span>AudiVo · MIT License · 2026</span>
+        <a href="https://github.com/RenzoFernando" target="_blank" rel="noreferrer">Renzo Fernando Mosquera Daza</a>
+    </footer>
+
+    <script src="web/app.js"></script>
+</body>
+</html>

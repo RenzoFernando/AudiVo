@@ -10,6 +10,12 @@ from app.app_meta import APP_DATA_APP_DIR_NAME, APP_DATA_ROOT_DIR_NAME
 
 class AppPaths:
     @staticmethod
+    def resource_dir() -> Path:
+        if hasattr(sys, "_MEIPASS"):
+            return Path(sys._MEIPASS).resolve()
+        return Path(__file__).resolve().parents[3]
+
+    @staticmethod
     def user_data_dir() -> Path:
         if sys.platform == "win32":
             base = Path(os.environ.get("APPDATA") or (Path.home() / "AppData" / "Roaming"))
@@ -40,6 +46,14 @@ class AppPaths:
     @classmethod
     def settings_file(cls) -> Path:
         return cls.others_dir() / "settings.json"
+
+    @classmethod
+    def assets_dir(cls) -> Path:
+        return cls.resource_dir() / "assets"
+
+    @classmethod
+    def app_icon_path(cls) -> Path:
+        return cls.assets_dir() / "icon.png"
 
     @classmethod
     def cleanup_temp(cls) -> None:
