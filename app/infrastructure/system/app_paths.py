@@ -1,0 +1,54 @@
+from __future__ import annotations
+
+import os
+import shutil
+import sys
+from pathlib import Path
+
+from app.app_meta import APP_DATA_APP_DIR_NAME, APP_DATA_ROOT_DIR_NAME
+
+
+class AppPaths:
+    @staticmethod
+    def user_data_dir() -> Path:
+        if sys.platform == "win32":
+            base = Path(os.environ.get("APPDATA") or (Path.home() / "AppData" / "Roaming"))
+        else:
+            base = Path(os.environ.get("XDG_CONFIG_HOME") or (Path.home() / ".config"))
+        path = base / APP_DATA_ROOT_DIR_NAME / APP_DATA_APP_DIR_NAME
+        path.mkdir(parents=True, exist_ok=True)
+        return path
+
+    @classmethod
+    def videos_dir(cls) -> Path:
+        path = cls.user_data_dir() / "Videos"
+        path.mkdir(parents=True, exist_ok=True)
+        return path
+
+    @classmethod
+    def others_dir(cls) -> Path:
+        path = cls.user_data_dir() / "Otros"
+        path.mkdir(parents=True, exist_ok=True)
+        return path
+
+    @classmethod
+    def temp_dir(cls) -> Path:
+        path = cls.others_dir() / "temp"
+        path.mkdir(parents=True, exist_ok=True)
+        return path
+
+    @classmethod
+    def settings_file(cls) -> Path:
+        return cls.others_dir() / "settings.json"
+
+    @classmethod
+    def cleanup_temp(cls) -> None:
+        directory = cls.temp_dir()
+        for path in directory.iterdir():
+            try:
+                if path.is_dir():
+                    shutil.rmtree(path, ignore_errors=True)
+                else:
+                    path.unlink(missing_ok=True)
+            except Exception:
+                pass

@@ -1,0 +1,116 @@
+from __future__ import annotations
+
+from pathlib import Path
+
+from PySide6.QtCore import QPointF, Qt, Signal
+from PySide6.QtGui import QColor, QPainter, QPen
+from PySide6.QtWidgets import QFrame, QHBoxLayout, QLabel, QPushButton, QSizePolicy, QVBoxLayout
+
+from app.presentation.translations import tr
+
+
+class CenteredCloseButton(QPushButton):
+    def paintEvent(self, event) -> None:
+        super().paintEvent(event)
+        painter = QPainter(self)
+        painter.setRenderHint(QPainter.RenderHint.Antialiasing, True)
+        color = QColor("#5f646d" if not self.isEnabled() else ("#ffffff" if self.underMouse() else "#8f959e"))
+        pen = QPen(color, 1.5)
+        pen.setCapStyle(Qt.PenCapStyle.RoundCap)
+        painter.setPen(pen)
+        center_x = self.width() / 2.0
+        center_y = self.height() / 2.0
+        radius = 3.2
+        painter.drawLine(QPointF(center_x - radius, center_y - radius), QPointF(center_x + radius, center_y + radius))
+        painter.drawLine(QPointF(center_x + radius, center_y - radius), QPointF(center_x - radius, center_y + radius))
+
+
+class CurrentAudioWidget(QFrame):
+    remove_requested = Signal()
+
+    def __init__(self, ui_language: str = "es", parent=None) -> None:
+        super().__init__(parent)
+        self._ui_language = ui_language
+        self._path: Path | None = None
+        self._duration: float | None = None
+        self.setObjectName("fileCard")
+        self.setFixedHeight(56)
+        layout = QHBoxLayout(self)
+        layout.setContentsMargins(11, 8, 10, 8)
+        layout.setSpacing(8)
+        self.dot = QLabel("●")
+        self.dot.setObjectName("fileDot")
+        self.dot.setProperty("state", "idle")
+        self.dot.setFixedWidth(10)
+        text_layout = QVBoxLayout()
+        text_layout.setContentsMargins(0, 0, 0, 0)
+        text_layout.setSpacing(1)
+        self.name_label = QLabel()
+        self.name_label.setObjectName("fileNameLabel")
+        self.name_label.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Preferred)
+        self.meta_label = QLabel()
+        self.meta_label.setObjectName("fileMetaLabel")
+        text_layout.addWidget(self.name_label)
+        text_layout.addWidget(self.meta_label)
+        self.remove_button = CenteredCloseButton()
+        self.remove_button.setObjectName("removeAudioButton")
+        self.remove_button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        self.remove_button.setVisible(False)
+        self.remove_button.clicked.connect(self.remove_requested.emit)
+        layout.addWidget(self.dot)
+        layout.addLayout(text_layout, 1)
+        layout.addWidget(self.remove_button, 0, Qt.AlignmentFlag.AlignVCenter)
+        self.clear()
+
+    def set_ui_language(self, ui_language: str) -> None:
+        self._ui_language = ui_language
+        self._refresh_text()
+
+    def set_audio(self, path: Path, duration: float | None) -> None:
+        self._path = path
+        self._duration = duration
+        self.name_label.setToolTip(str(path))
+        self._refresh_text()
+        self.set_state("selected")
+        self.set_remove_available(True)
+
+    def clear(self) -> None:
+        self._path = None
+        self._duration = None
+        self.name_label.setToolTip("")
+        self._refresh_text()
+        self.set_state("idle")
+        self.set_remove_available(False)
+
+    def set_state(self, state: str) -> None:
+        self.dot.setProperty("state", state)
+        self.dot.style().unpolish(self.dot)
+        self.dot.style().polish(self.dot)
+
+    def set_remove_available(self, available: bool) -> None:
+        self.remove_button.setVisible(available)
+        self.remove_button.setEnabled(available)
+
+    def set_interactions_enabled(self, enabled: bool) -> None:
+        available = enabled and self._path is not None
+        self.remove_button.setVisible(available)
+        self.remove_button.setEnabled(available)
+
+    def _refresh_text(self) -> None:
+        self.remove_button.setToolTip(tr(self._ui_language, "remove_audio_tooltip"))
+        if self._path is None:
+            self.name_label.setText(tr(self._ui_language, "no_audio"))
+            self.meta_label.setText(tr(self._ui_language, "select_drag"))
+            return
+        self.name_label.setText(self._path.name)
+        self.meta_label.setText(self._format_duration(self._duration))
+
+    def _format_duration(self, duration: float | None) -> str:
+        if duration is None:
+            return tr(self._ui_language, "unknown_duration")
+        total = max(0, int(duration))
+        hours, remainder = divmod(total, 3600)
+        minutes, seconds = divmod(remainder, 60)
+        if hours:
+            return f"{hours:02d}:{minutes:02d}:{seconds:02d}"
+        return f"{minutes:02d}:{seconds:02d}"

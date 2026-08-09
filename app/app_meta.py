@@ -1,0 +1,12 @@
+from __future__ import annotations
+
+APP_NAME_INTERNAL = "AudiVo"
+APP_DISPLAY_NAME = "AudiVo"
+APP_VERSION = "0.1.0"
+APP_AUTHOR = "Renzo Fernando Mosquera Daza"
+APP_VENDOR_NAME = "APPS_RenzoFernando"
+APP_COMPANY_NAME = APP_AUTHOR
+APP_PRODUCT_NAME = APP_DISPLAY_NAME
+APP_REPOSITORY_WEB_URL = "https://github.com/RenzoFernando/AudiVo"
+APP_DATA_ROOT_DIR_NAME = APP_VENDOR_NAME
+APP_DATA_APP_DIR_NAME = APP_NAME_INTERNAL
