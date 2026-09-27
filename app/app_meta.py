@@ -5,13 +5,13 @@ from datetime import datetime
 
 APP_NAME_INTERNAL = "AudiVo"
 APP_DISPLAY_NAME = "AudiVo"
-APP_VERSION = "2.1.0"
+APP_VERSION = "3.4.0"
 APP_AUTHOR = "Renzo Fernando Mosquera Daza"
 APP_VENDOR_NAME = "APPS_RenzoFernando"
 APP_COMPANY_NAME = APP_AUTHOR
 APP_PUBLISHER_NAME = APP_COMPANY_NAME
 APP_PRODUCT_NAME = APP_DISPLAY_NAME
-APP_FILE_DESCRIPTION = "Aplicacion de escritorio para convertir audio a video localmente con FFmpeg."
+APP_FILE_DESCRIPTION = "Aplicacion de escritorio para convertir audio a video y extraer audio de video localmente con FFmpeg."
 APP_TRADEMARK = APP_DISPLAY_NAME
 APP_REPOSITORY_URL = "https://github.com/RenzoFernando/AudiVo.git"
 APP_REPOSITORY_WEB_URL = APP_REPOSITORY_URL[:-4] if APP_REPOSITORY_URL.endswith(".git") else APP_REPOSITORY_URL

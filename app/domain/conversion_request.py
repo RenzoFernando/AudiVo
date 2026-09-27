@@ -13,3 +13,6 @@ class ConversionRequest:
     background_mode: str
     background_image: Path | None
     duration: float
+    mode: str
+    audio_format: str
+    audio_profile: str

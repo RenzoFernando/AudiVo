@@ -7,7 +7,7 @@ from collections import deque
 from pathlib import Path
 from typing import Callable
 
-from app.constants import CRF_BY_QUALITY
+from app.constants import CRF_BY_QUALITY, MODE_VIDEO_TO_AUDIO
 from app.domain.conversion_request import ConversionRequest
 from app.infrastructure.media.ffmpeg_provider import FFmpegProvider
 
@@ -17,21 +17,51 @@ class ConversionCancelled(RuntimeError):
 
 
 class ConversionService:
+    _AUDIO_EXTENSIONS = {
+        "FLAC": ".flac",
+        "MP3": ".mp3",
+        "M4A": ".m4a",
+        "WAV": ".wav",
+        "AAC": ".aac",
+        "OGG": ".ogg",
+        "OPUS": ".opus",
+        "WMA": ".wma",
+        "AIFF": ".aiff",
+        "AMR": ".amr",
+    }
+
     def __init__(self) -> None:
         self._ffmpeg = FFmpegProvider.executable()
         self._process: subprocess.Popen | None = None
         self._process_lock = threading.Lock()
 
-    def create_output_path(self, directory: Path, input_path: Path) -> Path:
-        raw_name = f"{input_path.stem}_video"
-        clean_name = re.sub(r'[<>:"/\|?*]+', "_", raw_name).strip().rstrip(".")
-        clean_name = clean_name or "audio_video"
-        candidate = directory / f"{clean_name}.mp4"
+    def create_output_path(
+        self,
+        directory: Path,
+        input_path: Path,
+        mode: str,
+        audio_format: str = "FLAC",
+        output_name: str | None = None,
+    ) -> Path:
+        suffix = self.output_extension(mode, audio_format)
+        raw_name = str(output_name or input_path.stem).strip()
+        if raw_name.casefold().endswith(suffix.casefold()):
+            raw_name = raw_name[:-len(suffix)].rstrip()
+        fallback_name = "audio" if mode == MODE_VIDEO_TO_AUDIO else "video"
+        clean_name = re.sub(r'[<>:"/\\|?*]+', "_", raw_name).strip().rstrip(".")
+        clean_name = clean_name or fallback_name
+        candidate = directory / f"{clean_name}{suffix}"
         counter = 1
         while candidate.exists():
-            candidate = directory / f"{clean_name}_{counter}.mp4"
+            candidate = directory / f"{clean_name} ({counter}){suffix}"
             counter += 1
         return candidate
+
+    @classmethod
+    def output_extension(cls, mode: str, audio_format: str = "FLAC") -> str:
+        if mode == MODE_VIDEO_TO_AUDIO:
+            return cls._AUDIO_EXTENSIONS.get(audio_format, ".flac")
+        return ".mp4"
 
     def convert(
         self,
@@ -75,7 +105,7 @@ class ConversionService:
                 raise ConversionCancelled()
             if return_code != 0:
                 detail = "\n".join(tail)
-                raise RuntimeError(detail or "FFmpeg no pudo crear el video.")
+                raise RuntimeError(detail or "FFmpeg no pudo completar la conversión.")
             progress_callback(100)
             return request.output_path
         except ConversionCancelled:
@@ -107,17 +137,14 @@ class ConversionService:
         callback(percent)
 
     def _build_command(self, request: ConversionRequest) -> list[str]:
+        if request.mode == MODE_VIDEO_TO_AUDIO:
+            return self._build_audio_command(request)
+        return self._build_video_command(request)
+
+    def _build_video_command(self, request: ConversionRequest) -> list[str]:
         width, height = request.resolution
         size = f"{width}x{height}"
-        common = [
-            self._ffmpeg,
-            "-y",
-            "-hide_banner",
-            "-loglevel",
-            "error",
-            "-stats_period",
-            "0.25",
-        ]
+        common = self._command_prefix()
         if request.background_mode == "Imagen":
             filter_value = (
                 f"scale={width}:{height}:force_original_aspect_ratio=decrease,"
@@ -178,6 +205,55 @@ class ConversionService:
             str(request.output_path),
         ])
         return common
+
+    def _build_audio_command(self, request: ConversionRequest) -> list[str]:
+        command = self._command_prefix()
+        command.extend([
+            "-i",
+            str(request.input_path),
+            "-map",
+            "0:a:0",
+            "-vn",
+        ])
+        command.extend(self._audio_codec_args(request.audio_format))
+        if request.audio_format != "AMR":
+            if request.audio_profile == "Voz":
+                command.extend(["-ar", "16000", "-ac", "1"])
+            elif request.audio_profile == "Estándar":
+                command.extend(["-ar", "48000", "-ac", "2"])
+        command.extend([
+            "-progress",
+            "pipe:1",
+            "-nostats",
+            str(request.output_path),
+        ])
+        return command
+
+    def _command_prefix(self) -> list[str]:
+        return [
+            self._ffmpeg,
+            "-y",
+            "-hide_banner",
+            "-loglevel",
+            "error",
+            "-stats_period",
+            "0.25",
+        ]
+
+    def _audio_codec_args(self, audio_format: str) -> list[str]:
+        codecs = {
+            "FLAC": ["-c:a", "flac", "-sample_fmt", "s16"],
+            "MP3": ["-c:a", "libmp3lame", "-b:a", "192k"],
+            "M4A": ["-c:a", "aac", "-b:a", "192k"],
+            "WAV": ["-c:a", "pcm_s16le"],
+            "AAC": ["-c:a", "aac", "-b:a", "192k"],
+            "OGG": ["-c:a", "libvorbis", "-q:a", "5"],
+            "OPUS": ["-c:a", "libopus", "-b:a", "128k"],
+            "WMA": ["-c:a", "wmav2", "-b:a", "192k"],
+            "AIFF": ["-c:a", "pcm_s16be"],
+            "AMR": ["-c:a", "libopencore_amrnb", "-ar", "8000", "-ac", "1", "-b:a", "12.2k"],
+        }
+        return list(codecs.get(audio_format, codecs["FLAC"]))
 
     def _stop_process(self, process: subprocess.Popen) -> None:
         if process.poll() is not None:

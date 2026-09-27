@@ -8,7 +8,7 @@
 
 <p>
   <a href="https://github.com/RenzoFernando/AudiVo/releases/latest">
-    <img src="https://img.shields.io/github/v/tag/RenzoFernando/AudiVo?sort=semver&style=for-the-badge&label=VERSI%C3%93N&color=3b82f6" alt="Versión actual">
+    <img src="https://img.shields.io/github/v/release/RenzoFernando/AudiVo?style=for-the-badge&label=VERSIÓN&color=3b82f6" alt="Última versión publicada">
   </a>
   <a href="https://github.com/RenzoFernando/AudiVo/releases/latest">
     <img src="https://img.shields.io/badge/VER%20RELEASES-20242b?style=for-the-badge" alt="Ver releases">
@@ -18,11 +18,11 @@
   </a>
 </p>
 
-<strong>Convierte audio en video directamente en tu computador.</strong>
+<strong>Convierte audio en video o extrae el audio de un video directamente en tu computador.</strong>
 
 <br><br>
 
-AudiVo genera videos MP4 a partir de archivos de audio mediante FFmpeg, con formato, calidad y fondo configurables.
+AudiVo convierte archivos localmente mediante FFmpeg y permite alternar entre audio → video y video → audio desde la misma interfaz.
 
 </div>
 
@@ -30,32 +30,48 @@ AudiVo genera videos MP4 a partir de archivos de audio mediante FFmpeg, con form
 
 ## Descripción
 
-**AudiVo** es una aplicación de escritorio enfocada en convertir audio a video de forma sencilla y local.
+**AudiVo** es una aplicación de escritorio enfocada en convertir audio y video de forma sencilla y local.
 
-Puedes seleccionar o arrastrar un audio, elegir el formato del video, la calidad y utilizar fondo negro, blanco o una imagen personalizada.
+Puedes seleccionar o arrastrar un archivo, cambiar el sentido de la conversión y conservar preferencias independientes para cada flujo. En audio → video puedes elegir formato visual, calidad y fondo; en video → audio puedes elegir el formato de salida y el perfil de audio.
 
 ## Funciones principales
 
-- **Archivos y arrastrar y soltar:** carga un audio desde la interfaz o mediante drag and drop.
+- **Dos modos de conversión:** alterna entre audio → video y video → audio desde el selector de la interfaz.
+- **Archivos y arrastrar y soltar:** carga el archivo desde la interfaz o mediante drag and drop.
 - **Formatos de video:** horizontal, vertical, cuadrado y otras relaciones de aspecto.
-- **Calidad configurable:** 480p, 720p y 1080p.
+- **Calidad configurable:** 480p, 720p y 1080p para la creación de video.
 - **Fondos:** negro, blanco o imagen personalizada conservando su proporción.
-- **Carpeta de salida configurable:** decide dónde guardar los videos.
-- **Progreso y cancelación:** consulta porcentaje, audio procesado y tiempo restante aproximado.
+- **Extracción de audio:** acepta videos reconocidos por FFmpeg que contengan una pista de audio, sin depender de una extensión concreta.
+- **Varios formatos de audio:** FLAC, MP3, M4A, WAV, AAC, OGG, OPUS, WMA, AIFF y AMR.
+- **Perfiles de audio:** Voz, Estándar y Original permiten elegir entre 16 kHz mono, 48 kHz estéreo o conservar frecuencia y canales de la fuente.
+- **Guardar como:** permite definir el nombre del archivo generado y elegir la carpeta de salida desde el botón de tres puntos.
+- **Preferencias persistentes:** recuerda el modo, formato de audio, perfil, opciones de video y carpeta de salida de cada modo.
+- **Progreso y cancelación:** consulta porcentaje, contenido procesado y tiempo restante aproximado.
 - **Interfaz en español e inglés.**
 - **Conversión local con FFmpeg.**
 
+## Modos de conversión
+
+| Modo | Entrada | Salida |
+| --- | --- | --- |
+| **Audio → Video** | MP3, M4A, WAV, AAC, FLAC, OGG, OPUS, WMA, AIFF y AMR | MP4 |
+| **Video → Audio** | Cualquier archivo que FFmpeg reconozca como video y que incluya una pista de audio | FLAC, MP3, M4A, WAV, AAC, OGG, OPUS, WMA, AIFF o AMR |
+
+En **Video → Audio**, AudiVo inicia con **FLAC** y el perfil **Voz** (`16 kHz · mono`). También puedes usar **Estándar** (`48 kHz · estéreo`) u **Original** para conservar la frecuencia y los canales de la fuente cuando el formato de salida lo permite.
+
 ## Uso
 
-1. Selecciona o arrastra un audio.
-2. Elige formato, calidad y fondo.
-3. Si usas una imagen, selecciónala desde la interfaz.
-4. Pulsa **CREAR VIDEO**.
-5. Abre el MP4 generado o su carpeta directamente desde AudiVo.
+1. Elige **AUDIO → VIDEO** o **VIDEO → AUDIO** desde el selector de la zona de entrada.
+2. Selecciona o arrastra el archivo que quieres convertir.
+3. Configura las opciones del modo actual, el nombre de salida y su carpeta.
+4. Pulsa **CREAR VIDEO** o **EXTRAER AUDIO**.
+5. Abre el archivo generado o su carpeta directamente desde AudiVo.
 
-Formatos compatibles:
+Formatos de audio compatibles:
 
 `MP3` · `M4A` · `WAV` · `AAC` · `FLAC` · `OGG` · `OPUS` · `WMA` · `AIFF` · `AMR`
+
+Para video → audio no se limita la selección a una lista cerrada de extensiones: AudiVo comprueba el archivo con FFmpeg y requiere una pista de video y una pista de audio válidas.
 
 ## Descarga
 
@@ -75,7 +91,7 @@ La versión de los ejecutables se obtiene desde `app/app_meta.py`, y la página 
 
 ## Privacidad y funcionamiento local
 
-AudiVo procesa el audio en el computador mediante FFmpeg. La conversión no depende de una API por minuto.
+AudiVo procesa el audio y el video directamente en el computador mediante FFmpeg. La conversión no depende de una API por minuto ni requiere enviar los archivos a un servicio externo.
 
 ## Licencia
 

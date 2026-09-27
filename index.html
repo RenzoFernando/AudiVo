@@ -3,9 +3,9 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="AudiVo convierte audio en video MP4 localmente con FFmpeg.">
+    <meta name="description" content="AudiVo convierte audio en video y extrae audio de video localmente con FFmpeg.">
     <meta name="theme-color" content="#0f1115">
-    <title>AudiVo · Audio a video local</title>
+    <title>AudiVo · Audio ↔ video local</title>
     <link rel="icon" href="assets/icon.png">
     <link rel="stylesheet" href="web/styles.css">
 </head>
@@ -30,8 +30,8 @@
                     <span id="release-status">GitHub Releases</span>
                     <span id="release-version"></span>
                 </div>
-                <h1>Del audio al video.<br><span>Sin salir de tu computador.</span></h1>
-                <p class="lead">Carga un audio, elige formato, calidad y fondo. AudiVo genera un MP4 localmente con FFmpeg.</p>
+                <h1>Del audio al video.<br><span>Y del video al audio.</span></h1>
+                <p class="lead">Crea MP4 desde audio o extrae la pista de un video a FLAC y otros formatos. Todo se procesa localmente con FFmpeg.</p>
                 <div class="hero-actions">
                     <a class="button primary release-download" id="hero-installer-link" href="https://github.com/RenzoFernando/AudiVo/releases/latest/download/AudiVo-Setup.exe">Descargar AudiVo</a>
                     <a class="button secondary release-download" id="hero-portable-link" href="https://github.com/RenzoFernando/AudiVo/releases/latest/download/AudiVo-Portable.exe">Portable</a>
@@ -43,84 +43,92 @@
                 </div>
             </div>
 
-            <div class="app-preview" aria-label="Vista simplificada de AudiVo">
+            <div class="app-preview" aria-label="Vista simplificada de AudiVo 3.4.0">
                 <div class="preview-title">
                     <span></span>
-                    <strong>AudiVo</strong>
+                    <div class="preview-brand-block">
+                        <strong>AudiVo</strong>
+                        <small>v3.4.0</small>
+                    </div>
                     <span></span>
                 </div>
+                <div class="preview-mode" aria-label="Modo de conversión">
+                    <b>AUDIO → VIDEO</b>
+                    <b class="active">VIDEO → AUDIO</b>
+                </div>
                 <div class="preview-input">
-                    <strong>Arrastra un audio aquí</strong>
-                    <small>o selecciona un archivo desde tu computador</small>
+                    <strong>Arrastra un video aquí</strong>
+                    <small>o selecciona cualquier archivo de video desde tu computador</small>
                     <div class="preview-input-actions">
-                        <b>Seleccionar audio</b>
+                        <b>Seleccionar video</b>
                     </div>
                 </div>
                 <div class="preview-current">
                     <i></i>
                     <div>
-                        <strong>Audio listo</strong>
+                        <strong>Video listo</strong>
                         <small>Un archivo a la vez</small>
                     </div>
                 </div>
                 <div class="preview-settings">
-                    <div><small>Formato</small><b>16:9 Horizontal</b></div>
-                    <div><small>Calidad</small><b>720p</b></div>
+                    <div><small>Formato de audio</small><b>FLAC</b></div>
+                    <div><small>Perfil</small><b>Voz</b></div>
                 </div>
-                <div class="preview-settings">
-                    <div><small>Fondo</small><b>Negro</b></div>
-                    <div><small>Salida</small><b>Videos</b></div>
+                <div class="preview-hint">16 kHz · mono</div>
+                <div class="preview-output">
+                    <small>Guardar como</small>
+                    <b>reunion.flac · Audios/</b>
                 </div>
-                <div class="preview-progress"><span>Creando video</span><small>42%</small></div>
+                <div class="preview-progress"><span>Extrayendo audio</span><small>42%</small></div>
                 <div class="preview-bar"><span></span></div>
-                <div class="preview-main-action">CREAR VIDEO</div>
-                <div class="preview-bottom-actions"><span>Abrir video</span><span>Abrir carpeta</span><span>ES</span></div>
+                <div class="preview-main-action">EXTRAER AUDIO</div>
+                <div class="preview-bottom-actions"><span>Abrir audio</span><span>Abrir carpeta</span><span>ES</span></div>
             </div>
         </section>
 
         <section class="section" id="funciones">
             <div class="section-heading">
                 <p class="eyebrow">LO ESENCIAL</p>
-                <h2>Una herramienta directa para crear video desde audio.</h2>
+                <h2>Dos conversiones en una sola aplicación.</h2>
             </div>
             <div class="feature-grid">
                 <article>
                     <span>01</span>
-                    <h3>Audio directo</h3>
-                    <p>Selecciona o arrastra un archivo compatible desde la misma interfaz.</p>
+                    <h3>Audio → Video</h3>
+                    <p>Crea MP4 con relaciones horizontales, verticales, cuadradas y ultrapanorámicas.</p>
                 </article>
                 <article>
                     <span>02</span>
-                    <h3>Formatos</h3>
-                    <p>Elige relaciones horizontales, verticales, cuadradas y ultrapanorámicas.</p>
+                    <h3>Video → Audio</h3>
+                    <p>Extrae la pista de videos reconocidos por FFmpeg a FLAC, MP3, M4A y otros formatos.</p>
                 </article>
                 <article>
                     <span>03</span>
-                    <h3>Calidad</h3>
-                    <p>Genera videos en 480p, 720p o 1080p según lo que necesites.</p>
+                    <h3>Perfiles de audio</h3>
+                    <p>Elige Voz a 16 kHz mono, Estándar a 48 kHz estéreo u Original para conservar la fuente.</p>
                 </article>
                 <article>
                     <span>04</span>
-                    <h3>Fondos</h3>
-                    <p>Usa negro, blanco o una imagen personalizada sin deformarla.</p>
+                    <h3>Video configurable</h3>
+                    <p>Combina 480p, 720p o 1080p con fondo negro, blanco o una imagen personalizada.</p>
                 </article>
                 <article>
                     <span>05</span>
-                    <h3>Progreso visible</h3>
-                    <p>Consulta porcentaje, audio procesado y tiempo restante aproximado.</p>
+                    <h3>Guardar como</h3>
+                    <p>Define el nombre del archivo y elige la carpeta de salida de audios y videos.</p>
                 </article>
                 <article>
                     <span>06</span>
-                    <h3>MP4 listo</h3>
-                    <p>Abre el video generado o su carpeta directamente desde AudiVo.</p>
+                    <h3>Progreso y acceso directo</h3>
+                    <p>Consulta el avance, cancela cuando lo necesites y abre el resultado o su carpeta.</p>
                 </article>
             </div>
         </section>
 
         <section class="local-section">
             <p class="eyebrow">LOCAL POR DISEÑO</p>
-            <h2>Convierte con FFmpeg directamente en tu computador.</h2>
-            <p>AudiVo genera el video localmente y no depende de una API por minuto.</p>
+            <h2>Audio y video procesados directamente en tu computador.</h2>
+            <p>FFmpeg realiza ambas conversiones localmente. Tus archivos no necesitan enviarse a una API o servicio externo.</p>
         </section>
 
         <section class="download-section" id="descargar">

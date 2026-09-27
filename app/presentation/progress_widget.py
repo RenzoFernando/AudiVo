@@ -3,13 +3,15 @@ from __future__ import annotations
 from PySide6.QtCore import QTimer, Qt
 from PySide6.QtWidgets import QFrame, QHBoxLayout, QLabel, QProgressBar, QVBoxLayout
 
+from app.constants import MODE_AUDIO_TO_VIDEO, MODE_VIDEO_TO_AUDIO
 from app.presentation.translations import tr
 
 
 class ProgressWidget(QFrame):
-    def __init__(self, ui_language: str = "es", parent=None) -> None:
+    def __init__(self, ui_language: str = "es", conversion_mode: str = MODE_AUDIO_TO_VIDEO, parent=None) -> None:
         super().__init__(parent)
         self._ui_language = ui_language
+        self._conversion_mode = conversion_mode
         self._waiting_step = 1
         self._waiting_active = True
         self.setObjectName("progressFrame")
@@ -42,6 +44,9 @@ class ProgressWidget(QFrame):
         if self._waiting_active:
             self._update_waiting_text()
 
+    def set_mode(self, conversion_mode: str) -> None:
+        self._conversion_mode = conversion_mode
+
     def set_waiting(self) -> None:
         self.progress.setVisible(True)
         self.progress.setRange(0, 100)
@@ -55,7 +60,8 @@ class ProgressWidget(QFrame):
         self.progress.setVisible(True)
         self.progress.setRange(0, 100)
         self.progress.setValue(0)
-        self.status_label.setText(tr(self._ui_language, "ready"))
+        key = "ready_audio" if self._conversion_mode == MODE_VIDEO_TO_AUDIO else "ready"
+        self.status_label.setText(tr(self._ui_language, key))
         self.detail_label.setText("")
         self._set_state("idle")
 
@@ -65,7 +71,8 @@ class ProgressWidget(QFrame):
         self.progress.setVisible(True)
         self.progress.setRange(0, 100)
         self.progress.setValue(normalized)
-        self.status_label.setText(tr(self._ui_language, "status_creating_video", value=normalized))
+        key = "status_creating_audio" if self._conversion_mode == MODE_VIDEO_TO_AUDIO else "status_creating_video"
+        self.status_label.setText(tr(self._ui_language, key, value=normalized))
         self.detail_label.setText(detail)
         self._set_state("idle")
 
@@ -92,7 +99,8 @@ class ProgressWidget(QFrame):
         self.progress.setVisible(True)
         self.progress.setRange(0, 100)
         self.progress.setValue(0)
-        self.status_label.setText(tr(self._ui_language, "conversion_error_status"))
+        key = "audio_conversion_error_status" if self._conversion_mode == MODE_VIDEO_TO_AUDIO else "conversion_error_status"
+        self.status_label.setText(tr(self._ui_language, key))
         self.detail_label.setText("")
         self._set_state("idle")
 

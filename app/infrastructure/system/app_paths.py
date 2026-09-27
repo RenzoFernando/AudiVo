@@ -32,6 +32,12 @@ class AppPaths:
         return path
 
     @classmethod
+    def audios_dir(cls) -> Path:
+        path = cls.user_data_dir() / "Audios"
+        path.mkdir(parents=True, exist_ok=True)
+        return path
+
+    @classmethod
     def others_dir(cls) -> Path:
         path = cls.user_data_dir() / "Otros"
         path.mkdir(parents=True, exist_ok=True)

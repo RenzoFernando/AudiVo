@@ -62,6 +62,10 @@ QLabel#etaLabel {
     color: #8b9099;
     font-size: 10px;
 }
+QLabel#modelHintLabel {
+    color: #60a5fa;
+    font-size: 9px;
+}
 QLabel#footerLabel {
     color: #8a8f98;
     font-size: 8px;

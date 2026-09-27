@@ -6,6 +6,7 @@ from PySide6.QtCore import QPointF, Qt, Signal
 from PySide6.QtGui import QColor, QPainter, QPen
 from PySide6.QtWidgets import QFrame, QHBoxLayout, QLabel, QPushButton, QSizePolicy, QVBoxLayout
 
+from app.constants import MODE_AUDIO_TO_VIDEO, MODE_VIDEO_TO_AUDIO
 from app.presentation.translations import tr
 
 
@@ -14,13 +15,13 @@ class CenteredCloseButton(QPushButton):
         super().paintEvent(event)
         painter = QPainter(self)
         painter.setRenderHint(QPainter.RenderHint.Antialiasing, True)
-        color = QColor("#5f646d" if not self.isEnabled() else ("#ffffff" if self.underMouse() else "#8f959e"))
-        pen = QPen(color, 1.5)
+        color = QColor("#5f646d" if not self.isEnabled() else ("#ffffff" if self.underMouse() else "#cfd3da"))
+        pen = QPen(color, 1.8)
         pen.setCapStyle(Qt.PenCapStyle.RoundCap)
         painter.setPen(pen)
         center_x = self.width() / 2.0
         center_y = self.height() / 2.0
-        radius = 3.2
+        radius = 3.5
         painter.drawLine(QPointF(center_x - radius, center_y - radius), QPointF(center_x + radius, center_y + radius))
         painter.drawLine(QPointF(center_x + radius, center_y - radius), QPointF(center_x - radius, center_y + radius))
 
@@ -28,9 +29,10 @@ class CenteredCloseButton(QPushButton):
 class CurrentAudioWidget(QFrame):
     remove_requested = Signal()
 
-    def __init__(self, ui_language: str = "es", parent=None) -> None:
+    def __init__(self, ui_language: str = "es", conversion_mode: str = MODE_AUDIO_TO_VIDEO, parent=None) -> None:
         super().__init__(parent)
         self._ui_language = ui_language
+        self._conversion_mode = conversion_mode
         self._path: Path | None = None
         self._duration: float | None = None
         self.setObjectName("fileCard")
@@ -66,13 +68,20 @@ class CurrentAudioWidget(QFrame):
         self._ui_language = ui_language
         self._refresh_text()
 
-    def set_audio(self, path: Path, duration: float | None) -> None:
+    def set_mode(self, conversion_mode: str) -> None:
+        self._conversion_mode = conversion_mode
+        self._refresh_text()
+
+    def set_media(self, path: Path, duration: float | None) -> None:
         self._path = path
         self._duration = duration
         self.name_label.setToolTip(str(path))
         self._refresh_text()
         self.set_state("selected")
         self.set_remove_available(True)
+
+    def set_audio(self, path: Path, duration: float | None) -> None:
+        self.set_media(path, duration)
 
     def clear(self) -> None:
         self._path = None
@@ -97,10 +106,17 @@ class CurrentAudioWidget(QFrame):
         self.remove_button.setEnabled(available)
 
     def _refresh_text(self) -> None:
-        self.remove_button.setToolTip(tr(self._ui_language, "remove_audio_tooltip"))
+        if self._conversion_mode == MODE_VIDEO_TO_AUDIO:
+            self.remove_button.setToolTip(tr(self._ui_language, "remove_video_tooltip"))
+            empty_name = tr(self._ui_language, "no_video")
+            empty_detail = tr(self._ui_language, "select_drag_video")
+        else:
+            self.remove_button.setToolTip(tr(self._ui_language, "remove_audio_tooltip"))
+            empty_name = tr(self._ui_language, "no_audio")
+            empty_detail = tr(self._ui_language, "select_drag")
         if self._path is None:
-            self.name_label.setText(tr(self._ui_language, "no_audio"))
-            self.meta_label.setText(tr(self._ui_language, "select_drag"))
+            self.name_label.setText(empty_name)
+            self.meta_label.setText(empty_detail)
             return
         self.name_label.setText(self._path.name)
         self.meta_label.setText(self._format_duration(self._duration))
